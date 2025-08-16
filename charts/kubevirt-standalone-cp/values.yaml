@@ -170,7 +170,7 @@ worker: # @schema description: Worker parameters; type: object
 
 # K0s parameters
 k0s: # @schema description: K0s parameters; type: object
-  version: v1.33.3+k0s.0 # @schema description: K0s version; type: string
+  version: v1.31.3+k0s.1 # @schema description: K0s version; type: string
   cloudProvider:
     enabled: false # @schema description: Enable cloud provider support; type: boolean
   api: # @schema description: Kubernetes API server parameters; type: object; additionalProperties: true
@@ -184,60 +184,6 @@ k0s: # @schema description: K0s parameters; type: object
       enabled: false # @schema description: Enable kubevirt-csi-driver-tenant helm chart in k0s; type: boolean
     kubevirtCloudControllerManager:
       enabled: false # @schema description: Enable kubevirt-cloud-controller-manager helm chart in k0s; type: boolean
-
-cloudControllerManager:
-  replicas: 1
-  repo: quay.io/kubevirt
-  name: kubevirt-cloud-controller-manager
-  tag: main
-  topologySpreadConstraints:
-    - labelSelector:
-        matchLabels:
-          k8s-app: kubevirt-cloud-controller-manager-{{ .Release.Name }}
-      matchLabelKeys:
-        - pod-template-hash
-      topologyKey: topology.kubernetes.io/zone
-      maxSkew: 1
-      whenUnsatisfiable: ScheduleAnyway
-
-kubevirtCsiDriver:
-  replicas: 1
-  infraStorageClassName: "standard" # change with storage class of Mothership
-  csiDriver:
-    repo: quay.io/kubevirt
-    name: kubevirt-csi-driver
-    tag: latest
-  csiProvisioner:
-    repo: k8s.gcr.io/sig-storage
-    name: csi-provisioner
-    tag: v5.1.0
-  csiAttacher:
-    repo: k8s.gcr.io/sig-storage
-    name: csi-attacher
-    tag: v4.4.3
-  csiLivenessProbe:
-    repo: k8s.gcr.io/sig-storage
-    name: livenessprobe
-    tag: v2.12.0
-  csiSnapshotter:
-    repo: k8s.gcr.io/sig-storage
-    name: csi-snapshotter
-    tag: v7.0.2
-  csiResizer:
-    repo: k8s.gcr.io/sig-storage
-    name: csi-resizer
-    tag: v1.13.1
-  nodeSelector:
-    node-role.kubernetes.io/control-plane: "true"
-  topologySpreadConstraints:
-    - labelSelector:
-        matchLabels:
-          k8s-app: kubevirt-csi-driver-{{ .Release.Name }}
-      matchLabelKeys:
-        - pod-template-hash
-      topologyKey: topology.kubernetes.io/zone
-      maxSkew: 1
-      whenUnsatisfiable: ScheduleAnyway
 
 machineHealthCheck:
   enabled: false

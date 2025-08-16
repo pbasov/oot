@@ -1,4 +1,3 @@
-{{- $global := .Values.global | default dict }}
 apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
 kind: K0sWorkerConfigTemplate
 metadata:
@@ -7,9 +6,6 @@ metadata:
 spec:
   template:
     spec:
-      {{- if $global.k0sURL }}
-      downloadURL: "{{ $global.k0sURL }}/k0s-{{ .Values.k0s.version }}-amd64"
-      {{- end }}
       version: {{ .Values.k0s.version }}
       args:
         {{- if .Values.k0s.cloudProvider.enabled }}
@@ -20,23 +16,7 @@ spec:
       {{- if .Values.worker.files }}
         {{- toYaml .Values.worker.files | nindent 8 }}
       {{- end }}
-      {{- if or $global.registryCertSecret $global.k0sURLCertSecret }}
-      {{- $certs := dict "registry.crt" $global.registryCertSecret "k0s-url.crt" $global.k0sURLCertSecret }}
-        {{- range $path, $secret := $certs }}
-        {{- if $secret }}
-        - contentFrom:
-            secretRef:
-              name: {{ $secret }}
-              key: tls.crt
-          permissions: "0664"
-          path: /usr/local/share/ca-certificates/{{ $path }}
-        {{- end }}
-        {{- end }}
-      {{- end }}
       preStartCommands:
       {{- with .Values.worker.preStartCommands }}
         {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- if or $global.registryCertSecret $global.k0sURLCertSecret }}
-        - sudo update-ca-certificates
       {{- end }}
